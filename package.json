@@ -1,0 +1,68 @@
+{
+  "name": "escape-lens",
+  "displayName": "Escape Lens",
+  "description": "Inline badges that reveal the real characters behind escape sequences — \\n, \\u003e, &lt;, %3C and more.",
+  "version": "0.1.0",
+  "publisher": "HDstar",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "escape-lens.toggle",
+        "title": "Toggle",
+        "category": "Escape Lens"
+      }
+    ],
+    "configuration": {
+      "title": "Escape Lens",
+      "properties": {
+        "escapeLens.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Master switch: show badges with the real characters next to escape sequences"
+        },
+        "escapeLens.backslash": {
+          "type": "boolean",
+          "default": true,
+          "description": "Detect backslash escapes (\\n, \\t, \\u003e, \\x41, …)"
+        },
+        "escapeLens.htmlEntities": {
+          "type": "boolean",
+          "default": true,
+          "description": "Detect HTML entities (&lt;, &#62;, &#x3e;, …)"
+        },
+        "escapeLens.urlEncoding": {
+          "type": "boolean",
+          "default": true,
+          "description": "Detect URL percent-encoding (%3C, %E4%B8%AD, …)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "node esbuild.js --production",
+    "build": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "typecheck": "tsc --noEmit",
+    "smoke": "esbuild --bundle scripts/smoke.ts --platform=node --outfile=dist/smoke.js && node dist/smoke.js",
+    "test": "npm run build && esbuild --bundle src/test/suite.ts --platform=node --format=cjs --external:vscode --outfile=dist/test-suite.js && node scripts/run-tests.js",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/test-electron": "^3.1.0",
+    "esbuild": "^0.21.5",
+    "typescript": "^5.4.5"
+  }
+}
