@@ -3,8 +3,9 @@
   "displayName": "Escape Lens",
   "description": "Inline badges that reveal the real characters behind escape sequences — \\n, \\u003e, &lt;, %3C and more.",
   "version": "0.1.0",
-  "publisher": "HDstar",
+  "publisher": "Jeceroct",
   "license": "MIT",
+  "repository": "https://github.com/Jeceroct/escape-lens",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -15,6 +16,7 @@
     "onStartupFinished"
   ],
   "main": "./dist/extension.js",
+  "icon": "media/icon.png",
   "contributes": {
     "commands": [
       {
