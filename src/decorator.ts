@@ -16,6 +16,9 @@ export class EscapeLens {
   private options: MatcherOptions = { backslash: true, htmlEntities: true, urlEncoding: true };
   private timer: ReturnType<typeof setTimeout> | undefined;
   private statusItem: vscode.StatusBarItem;
+  // 超大文件需用户确认后才解析；确认结果仅本次会话有效
+  private confirmedFiles = new Set<string>();
+  private promptedFiles = new Set<string>();
 
   constructor() {
     this.statusItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
@@ -31,6 +34,8 @@ export class EscapeLens {
       vscode.window.onDidChangeActiveTextEditor((editor) => this.updateEditor(editor)),
       vscode.window.onDidChangeVisibleTextEditors(() => this.updateAll()),
       vscode.workspace.onDidChangeTextDocument(() => this.scheduleUpdate()),
+      // 关闭文档后清除"已询问"标记，重新打开可再次询问
+      vscode.workspace.onDidCloseTextDocument((doc) => this.promptedFiles.delete(doc.uri.toString())),
       vscode.workspace.onDidChangeConfiguration((e) => {
         if (e.affectsConfiguration("escapeLens")) {
           this.readConfig();
@@ -104,6 +109,28 @@ export class EscapeLens {
     }
   }
 
+  private askToParseLargeFile(editor: vscode.TextEditor, size: number): void {
+    const key = editor.document.uri.toString();
+    if (this.promptedFiles.has(key)) {
+      return; // 已询问过且未同意，等待关闭重开或下次会话
+    }
+    this.promptedFiles.add(key);
+    const mb = (size / 1_000_000).toFixed(1);
+    const name = vscode.workspace.asRelativePath(editor.document.uri);
+    void vscode.window
+      .showInformationMessage(
+        `Escape Lens: "${name}" is ${mb} MB. Scanning a file this large may slow down the editor. Parse it anyway?`,
+        "Parse Anyway",
+        "Skip"
+      )
+      .then((choice) => {
+        if (choice === "Parse Anyway") {
+          this.confirmedFiles.add(key);
+          this.updateAll();
+        }
+      });
+  }
+
   private updateAll(): void {
     for (const editor of vscode.window.visibleTextEditors) {
       this.updateEditor(editor);
@@ -120,7 +147,8 @@ export class EscapeLens {
       return;
     }
     const text = doc.getText();
-    if (text.length > MAX_FILE_SIZE) {
+    if (text.length > MAX_FILE_SIZE && !this.confirmedFiles.has(doc.uri.toString())) {
+      this.askToParseLargeFile(editor, text.length);
       editor.setDecorations(this.decorationType, []);
       return;
     }
