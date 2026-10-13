@@ -54,3 +54,22 @@ function collect(text: string, re: RegExp, decode: DecodeFn, out: EscapeDecorati
     out.push({ start: m.index, end: m.index + m[0].length, display });
   }
 }
+
+// 锚定版：判断选中文本是否恰好是一整个转义序列（而非包含）
+const BACKSLASH_FULL_RE = /^\\(?:u\{[0-9a-fA-F]{1,6}\}|u[0-9a-fA-F]{4}|x[0-9a-fA-F]{2}|[nrtbfv0'"`\\])$/;
+const ENTITY_FULL_RE = /^&(?:#[xX][0-9a-fA-F]{1,6};|#[0-9]{1,7};|[a-zA-Z][a-zA-Z0-9]{1,30};)$/;
+const URL_FULL_RE = /^(?:%[0-9a-fA-F]{2})+$/;
+
+/** 选中文本恰好是一整个转义序列时返回解码结果，否则返回 null */
+export function decodeExact(text: string): string | null {
+  if (BACKSLASH_FULL_RE.test(text)) {
+    return decodeBackslashEscape(text);
+  }
+  if (ENTITY_FULL_RE.test(text)) {
+    return decodeHtmlEntity(text);
+  }
+  if (URL_FULL_RE.test(text)) {
+    return decodeUrlRun(text);
+  }
+  return null;
+}

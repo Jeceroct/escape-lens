@@ -50,7 +50,7 @@ npm run package
 ```
 
 Command Palette → **Extensions: Install from VSIX…** → pick the generated
-`escape-lens-0.1.0.vsix`.
+`escape-lens-0.2.0.vsix`.
 
 ### Try it without installing
 
@@ -82,6 +82,33 @@ Extension Development Host window starts with Escape Lens active. Open
 
 For example, reading logs full of URLs but no HTML? Turn off
 `escapeLens.htmlEntities` and `escapeLens.backslash` to keep only percent-decoding.
+
+## Replace with escapes
+
+The lens works both ways. Select some text, right-click, and open
+**Escape Lens: change to ...** to swap the selection for its escaped form:
+
+| Menu item | `<中 😀` becomes |
+| --- | --- |
+| Decoded character | `>` (e.g. `&lt;` → `<`, `%3C` → `<`) — offered only when the selection itself is a recognized escape sequence |
+| Backslash | `\x3c\u4e2d\u{1f600}` (shortest form: `\n` `\t` `\x3c` `\u4e2d` `\u{1f600}`) |
+| Unicode | `\u003c\u4e2d\ud83d\ude00` (always `\uHHHH`, emoji as surrogate pairs — JSON-safe) |
+| HTML named entity | `&lt;&#20013;&#128512;` (falls back to numeric when no name exists) |
+| HTML decimal | `&#60;&#20013;&#128512;` |
+| HTML hex | `&#x3c;&#x4e2d;&#x1f600;` |
+| URL percent-encoding | `%3C%E4%B8%AD%20%F0%9F%98%80` (same rules as `encodeURIComponent`) |
+
+A few details:
+
+- The submenu only appears when something is selected.
+- The **Decoded character** item is smart: it only shows up when the selection is
+  exactly one escape sequence the lens itself would recognize (a backslash
+  escape, an HTML entity, or a run of percent escapes). Select `\n` → get a real
+  newline; select `%E4%B8%AD` → get `中`. It's the badge, made editable.
+- Multiple cursors? Every selection is replaced in one go.
+- Replacements are ordinary edits — undo with `Ctrl/Cmd + Z`.
+- Right after replacing, the new escape sequence lights up with its own badge,
+  so you can see what you just did.
 
 ## Large files
 

@@ -372,3 +372,15 @@ const NAMED_ENTITIES: Readonly<Record<string, string>> = {
   upsih: "ϒ",
   piv: "ϖ",
 };
+
+/** 反查表：字符 → 实体名（同名冲突时取最短名），供编码方向使用 */
+export const NAMED_ENTITY_BY_CHAR: Readonly<Record<string, string>> = (() => {
+  const byChar: Record<string, string> = {};
+  for (const [name, ch] of Object.entries(NAMED_ENTITIES)) {
+    const prev = byChar[ch];
+    if (prev === undefined || name.length < prev.length) {
+      byChar[ch] = name;
+    }
+  }
+  return byChar;
+})();

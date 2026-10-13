@@ -2,7 +2,7 @@
   "name": "escape-lens",
   "displayName": "Escape Lens",
   "description": "Inline badges that reveal the real characters behind escape sequences — \\n, \\u003e, &lt;, %3C and more.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "HDstar",
   "license": "MIT",
   "repository": "https://github.com/Jeceroct/escape-lens",
@@ -23,8 +23,73 @@
         "command": "escape-lens.toggle",
         "title": "Toggle",
         "category": "Escape Lens"
+      },
+      {
+        "command": "escape-lens.replace.decode",
+        "title": "Decoded character  &lt; → <"
+      },
+      {
+        "command": "escape-lens.replace.backslash",
+        "title": "Backslash  \\n, \\x3c, \\u4e2d, \\u{1F600}"
+      },
+      {
+        "command": "escape-lens.replace.unicode",
+        "title": "Unicode  \\u003c, \\ud83d\\ude00"
+      },
+      {
+        "command": "escape-lens.replace.htmlNamed",
+        "title": "HTML named entity  &lt;"
+      },
+      {
+        "command": "escape-lens.replace.htmlDecimal",
+        "title": "HTML decimal  &#60;"
+      },
+      {
+        "command": "escape-lens.replace.htmlHex",
+        "title": "HTML hex  &#x3c;"
+      },
+      {
+        "command": "escape-lens.replace.url",
+        "title": "URL percent-encoding  %3C, %E4%B8%AD"
       }
     ],
+    "submenus": [
+      {
+        "id": "escape-lens.replace",
+        "label": "Escape Lens: change to ..."
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "submenu": "escape-lens.replace",
+          "group": "escape-lens",
+          "when": "editorHasSelection"
+        }
+      ],
+      "escape-lens.replace": [
+        {
+          "command": "escape-lens.replace.decode",
+          "group": "1_decode",
+          "when": "escapeLens.selectionIsEscape"
+        },
+        { "command": "escape-lens.replace.backslash", "group": "2_escape@1" },
+        { "command": "escape-lens.replace.unicode", "group": "2_escape@2" },
+        { "command": "escape-lens.replace.htmlNamed", "group": "2_escape@3" },
+        { "command": "escape-lens.replace.htmlDecimal", "group": "2_escape@4" },
+        { "command": "escape-lens.replace.htmlHex", "group": "2_escape@5" },
+        { "command": "escape-lens.replace.url", "group": "2_escape@6" }
+      ],
+      "commandPalette": [
+        { "command": "escape-lens.replace.decode", "when": "false" },
+        { "command": "escape-lens.replace.backslash", "when": "false" },
+        { "command": "escape-lens.replace.unicode", "when": "false" },
+        { "command": "escape-lens.replace.htmlNamed", "when": "false" },
+        { "command": "escape-lens.replace.htmlDecimal", "when": "false" },
+        { "command": "escape-lens.replace.htmlHex", "when": "false" },
+        { "command": "escape-lens.replace.url", "when": "false" }
+      ]
+    },
     "configuration": {
       "title": "Escape Lens",
       "properties": {
